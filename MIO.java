@@ -31,53 +31,61 @@ class MIO {
 
     //чтение из символьного потока
     public static MusicCollection readMusicCollection(Reader in) throws IOException {
-        StreamTokenizer tokenizer = new StreamTokenizer(in);
+        // Читаем все содержимое в строку
+        StringBuilder sb = new StringBuilder();
+        int ch;
+        while ((ch = in.read()) != -1) {
+            sb.append((char) ch);
+        }
+        String line = sb.toString().trim();
 
-        // Настраиваем tokenizer для правильной работы
-        tokenizer.resetSyntax();
-        tokenizer.wordChars('a', 'z');
-        tokenizer.wordChars('A', 'Z');
-        tokenizer.wordChars('0', '9');
-        tokenizer.wordChars('_', '_');
-        tokenizer.wordChars(128 + 32, 255);
-        tokenizer.whitespaceChars(' ', ' ');
-        tokenizer.whitespaceChars('\t', '\t');
-        tokenizer.whitespaceChars('\n', '\n');
-        tokenizer.whitespaceChars('\r', '\r');
-
-        // Чтение названия
-        StringBuilder titleBuilder = new StringBuilder();
-        while (tokenizer.nextToken() == StreamTokenizer.TT_WORD) {
-            if (titleBuilder.length() > 0) {
-                titleBuilder.append(" ");
-            }
-            titleBuilder.append(tokenizer.sval);
+        if (line.isEmpty()) {
+            return null;
         }
 
-        if (tokenizer.ttype != StreamTokenizer.TT_NUMBER) {
-            throw new IOException("Ожидалось число для specialValue после названия");
+        // Разбиваем строку на токены по пробелам
+        String[] tokens = line.split("\\s+");
+        if (tokens.length < 3) {
+            throw new IOException("Ошибка формата: недостаточно данных в строке: " + line);
         }
-        String title = titleBuilder.toString().replace("_", " ");
-        int specialValue = (int) tokenizer.nval;
 
-        // чтение количества треков
-        if (tokenizer.nextToken() != StreamTokenizer.TT_NUMBER) {
-            throw new IOException("Ожидалось число для количества треков");
+        // Первый токен - название (заменяем подчеркивания на пробелы)
+        String title = tokens[0].replace("_", " ");
+
+        // Второй токен - specialValue
+        int specialValue;
+        try {
+            specialValue = Integer.parseInt(tokens[1]);
+        } catch (NumberFormatException e) {
+            throw new IOException("Ошибка формата specialValue: " + tokens[1]);
         }
-        int trackCount = (int) tokenizer.nval;
 
-        // чтение длительностей треков
+        // Третий токен - количество треков
+        int trackCount;
+        try {
+            trackCount = Integer.parseInt(tokens[2]);
+        } catch (NumberFormatException e) {
+            throw new IOException("Ошибка формата количества треков: " + tokens[2]);
+        }
+
+        // Проверяем, что достаточно данных для всех длительностей треков
+        if (tokens.length < 3 + trackCount) {
+            throw new IOException("Недостаточно данных для длительностей треков. Ожидалось: " + trackCount +
+                    ", найдено: " + (tokens.length - 3));
+        }
+
+        // Читаем длительности треков
         int[] durations = new int[trackCount];
         for (int i = 0; i < trackCount; i++) {
-            if (tokenizer.nextToken() != StreamTokenizer.TT_NUMBER) {
-                throw new IOException("Ожидалось число для длительности трека " + (i + 1));
+            try {
+                durations[i] = Integer.parseInt(tokens[3 + i]);
+            } catch (NumberFormatException e) {
+                throw new IOException("Ошибка формата длительности трека " + (i + 1) + ": " + tokens[3 + i]);
             }
-            durations[i] = (int) tokenizer.nval;
         }
 
         return new Album(durations, title, specialValue);
     }
-
     //вывод сериализованных объектов
     public static void serializeMusicCollection(MusicCollection o, OutputStream out) throws IOException {
         ObjectOutputStream oos = new ObjectOutputStream(out);

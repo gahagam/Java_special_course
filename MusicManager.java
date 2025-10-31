@@ -75,7 +75,6 @@ public class MusicManager {
         }
     }
 
-
     private static void addCollection() {
         System.out.println("1 - Альбом");
         System.out.println("2 - Плейлист");
@@ -171,26 +170,54 @@ public class MusicManager {
 
 
     private static void workWithByteStreams() {
-        System.out.println("\nБайтовые потоки");
+        boolean inMenu = true;
+        while (inMenu) {
+            System.out.println("\nБайтовые потоки");
+            System.out.println("1 - Запись в байтовый поток");
+            System.out.println("2 - Чтение из байтового потока");
+            System.out.println("0 - Назад");
+
+            int choice = getInt("Ваш выбор: ");
+            switch (choice) {
+                case 1:
+                    byteStreamOutput();
+                    break;
+                case 2:
+                    byteStreamInput();
+                    break;
+                case 0:
+                    inMenu = false;
+                    break;
+                default:
+                    System.out.println("Неверный выбор!");
+            }
+        }
+    }
+
+    private static void byteStreamOutput() {
         if (collections.isEmpty()) {
             System.out.println("Нет коллекций для записи!");
             return;
         }
 
         String filename = "music_collections.dat";
-
         try {
-            // Запись в байтовый поток
-            System.out.println("Запись " + collections.size() + " коллекций в файл...");
+            System.out.println("Запись " + collections.size() + " коллекций в байтовый поток...");
             FileOutputStream fos = new FileOutputStream(filename);
             for (MusicCollection mc : collections) {
                 MIO.outputMusicCollection(mc, fos);
             }
             fos.close();
-            System.out.println("Запись завершена!");
+            System.out.println("Запись завершена! Файл: " + filename);
+        } catch (IOException e) {
+            System.out.println("Ошибка записи: " + e.getMessage());
+        }
+    }
 
-            // Чтение из байтового потока
-            System.out.println("Чтение коллекций из файла");
+    private static void byteStreamInput() {
+        String filename = "music_collections.dat";
+        try {
+            System.out.println("Чтение коллекций из байтового потока...");
             FileInputStream fis = new FileInputStream(filename);
             List<MusicCollection> readCollections = new ArrayList<>();
 
@@ -203,34 +230,63 @@ public class MusicManager {
             System.out.println("Прочитано " + readCollections.size() + " коллекций:");
             for (MusicCollection collection : readCollections) {
                 System.out.println("  - " + collection);
+                collections.add(collection); // Добавляем в основную коллекцию
             }
-
         } catch (IOException e) {
-            System.out.println("Ошибка ввода-вывода: " + e.getMessage());
+            System.out.println("Ошибка чтения: " + e.getMessage());
         }
     }
 
     private static void workWithCharStreams() {
-        System.out.println("\nСимвольные потоки");
+        boolean inMenu = true;
+        while (inMenu) {
+            System.out.println("\nСимвольные потоки");
+            System.out.println("1 - Запись в символьный поток");
+            System.out.println("2 - Чтение из символьного потока");
+            System.out.println("0 - Назад");
+
+            int choice = getInt("Ваш выбор: ");
+            switch (choice) {
+                case 1:
+                    charStreamOutput();
+                    break;
+                case 2:
+                    charStreamInput();
+                    break;
+                case 0:
+                    inMenu = false;
+                    break;
+                default:
+                    System.out.println("Неверный выбор!");
+            }
+        }
+    }
+
+    private static void charStreamOutput() {
         if (collections.isEmpty()) {
             System.out.println("Нет коллекций для записи!");
             return;
         }
 
         String filename = "music_collections.txt";
-
         try {
-            // Запись в символьный поток
-            System.out.println("Запись " + collections.size() + " коллекций в файл...");
+            System.out.println("Запись " + collections.size() + " коллекций в символьный поток...");
             FileWriter fw = new FileWriter(filename);
             for (MusicCollection mc : collections) {
                 MIO.writeMusicCollection(mc, fw);
             }
             fw.close();
-            System.out.println("Запись завершена!");
+            System.out.println("Запись завершена! Файл: " + filename);
+        } catch (IOException e) {
+            System.out.println("Ошибка записи: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 
-            // Чтение из символьного потока
-            System.out.println("Чтение коллекций из файла...");
+    private static void charStreamInput() {
+        String filename = "music_collections.txt";
+        try {
+            System.out.println("Чтение коллекций из символьного потока...");
             FileReader fr = new FileReader(filename);
             List<MusicCollection> readCollections = new ArrayList<>();
 
@@ -243,35 +299,62 @@ public class MusicManager {
             System.out.println("Прочитано " + readCollections.size() + " коллекций:");
             for (MusicCollection collection : readCollections) {
                 System.out.println("  - " + collection);
+                collections.add(collection); // Добавляем в основную коллекцию
             }
-
         } catch (IOException e) {
-            System.out.println("Ошибка ввода-вывода: " + e.getMessage());
-            e.printStackTrace();
+            System.out.println("Ошибка чтения: " + e.getMessage());
         }
     }
 
     private static void workWithSerialization() {
-        System.out.println("\nСериализация");
+        boolean inMenu = true;
+        while (inMenu) {
+            System.out.println("\nСериализация");
+            System.out.println("1 - Сериализация");
+            System.out.println("2 - Десериализация");
+            System.out.println("0 - Назад");
+
+            int choice = getInt("Ваш выбор: ");
+            switch (choice) {
+                case 1:
+                    serializationOutput();
+                    break;
+                case 2:
+                    serializationInput();
+                    break;
+                case 0:
+                    inMenu = false;
+                    break;
+                default:
+                    System.out.println("Неверный выбор!");
+            }
+        }
+    }
+
+    private static void serializationOutput() {
         if (collections.isEmpty()) {
             System.out.println("Нет коллекций для сериализации!");
             return;
         }
 
         String filename = "music_collections.ser";
-
         try {
-            // Сериализация
-            System.out.println("Сериализация " + collections.size() + " коллекций");
+            System.out.println("Сериализация " + collections.size() + " коллекций...");
             FileOutputStream fos = new FileOutputStream(filename);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             for (MusicCollection mc : collections) {
                 MIO.serializeMusicCollection(mc, oos);
             }
             oos.close();
-            System.out.println("Сериализация завершена!");
+            System.out.println("Сериализация завершена! Файл: " + filename);
+        } catch (IOException e) {
+            System.out.println("Ошибка сериализации: " + e.getMessage());
+        }
+    }
 
-            // Десериализация
+    private static void serializationInput() {
+        String filename = "music_collections.ser";
+        try {
             System.out.println("Десериализация коллекций");
             FileInputStream fis = new FileInputStream(filename);
             ObjectInputStream ois = new ObjectInputStream(fis);
@@ -283,17 +366,17 @@ public class MusicManager {
                     deserializedCollections.add(mc);
                 }
             } catch (EOFException e) {
-                // Конец файла
+                // Конец файла - нормальная ситуация
             }
             ois.close();
 
             System.out.println("Десериализовано " + deserializedCollections.size() + " коллекций:");
             for (MusicCollection mc : deserializedCollections) {
                 System.out.println("  - " + mc);
+                collections.add(mc); // Добавляем в основную коллекцию
             }
-
         } catch (IOException | ClassNotFoundException e) {
-            System.out.println("Ошибка: " + e.getMessage());
+            System.out.println("Ошибка десериализации: " + e.getMessage());
         }
     }
 
