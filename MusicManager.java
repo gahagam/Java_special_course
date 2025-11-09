@@ -6,7 +6,7 @@ public class MusicManager {
     private static List<MusicCollection> collections = new ArrayList<>();
 
     public static void main(String[] args) {
-        System.out.println("Лабораторная 4. Хархавкина Мария 6301");
+        System.out.println("Лабораторная работа 4. Хархавкина Мария 6301");
         System.out.println("Music Collection");
 
         boolean x = true;
