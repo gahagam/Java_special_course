@@ -20,7 +20,7 @@ public class MusicManager {
             int choice = getInt("Ваш выбор: ");
             switch (choice) {
                 case 1:
-                    Lr3();
+                    lR3();
                     break;
                 case 2:
                     workWithByteStreams();
@@ -44,7 +44,7 @@ public class MusicManager {
         }
     }
 
-    private static void Lr3() {
+    private static void lR3() {
         boolean x1 = true;
         while (x1) {
             System.out.println("1 - Добавить коллекцию");
@@ -286,20 +286,20 @@ public class MusicManager {
     private static void charStreamInput() {
         String filename = "music_collections.txt";
         try {
-            System.out.println("Чтение коллекций из символьного потока...");
+            System.out.println("Чтение коллекций из символьного потока");
             FileReader fr = new FileReader(filename);
-            List<MusicCollection> readCollections = new ArrayList<>();
+
+            collections.clear();
 
             MusicCollection mc;
             while ((mc = MIO.readMusicCollection(fr)) != null) {
-                readCollections.add(mc);
+                collections.add(mc);
             }
             fr.close();
 
-            System.out.println("Прочитано " + readCollections.size() + " коллекций:");
-            for (MusicCollection collection : readCollections) {
+            System.out.println("Прочитано " + collections.size() + " коллекций:");
+            for (MusicCollection collection : collections) {
                 System.out.println("  - " + collection);
-                collections.add(collection); // Добавляем в основную коллекцию
             }
         } catch (IOException e) {
             System.out.println("Ошибка чтения: " + e.getMessage());
@@ -339,7 +339,7 @@ public class MusicManager {
 
         String filename = "music_collections.ser";
         try {
-            System.out.println("Сериализация " + collections.size() + " коллекций...");
+            System.out.println("Сериализация " + collections.size() + " коллекций");
             FileOutputStream fos = new FileOutputStream(filename);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             for (MusicCollection mc : collections) {
@@ -366,7 +366,7 @@ public class MusicManager {
                     deserializedCollections.add(mc);
                 }
             } catch (EOFException e) {
-                // Конец файла - нормальная ситуация
+                // конец
             }
             ois.close();
 
@@ -415,7 +415,7 @@ public class MusicManager {
         String filename = "music_collections_formatted.txt";
 
         try {
-            System.out.println("Форматный вывод в файл...");
+            System.out.println("Форматный вывод в файл");
             FileWriter fw = new FileWriter(filename);
             for (MusicCollection mc : collections) {
                 MIO.writeFormatMusicCollection(mc, fw);
