@@ -20,7 +20,7 @@ public class Playlist implements MusicCollection, Serializable {
         }
 
         for (int duration : trackDurations) {
-            if (duration <= 0) {
+            if (duration < 0) {
                 throw new MusicValidationException("Длительность каждого трека должна быть положительной: " + duration);
             }
         }
@@ -36,6 +36,11 @@ public class Playlist implements MusicCollection, Serializable {
         this.trackDurations = trackDurations.clone();
         this.title = title;
         this.skipThreshold = skipThreshold;
+    }
+
+    @Override
+    public int length() {
+        return trackDurations.length;
     }
 
     @Override

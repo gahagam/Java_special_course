@@ -31,7 +31,7 @@ class MIO {
 
     //чтение из символьного потока
     public static MusicCollection readMusicCollection(Reader in) throws IOException {
-        // Читаем все содержимое в строку
+        //  все содержимое в строку
         StringBuilder sb = new StringBuilder();
         int ch;
         while ((ch = in.read()) != -1) {
@@ -43,16 +43,13 @@ class MIO {
             return null;
         }
 
-        // Разбиваем строку на токены по пробелам
         String[] tokens = line.split("\\s+");
         if (tokens.length < 3) {
             throw new IOException("Ошибка формата: недостаточно данных в строке: " + line);
         }
 
-        // Первый токен - название (заменяем подчеркивания на пробелы)
         String title = tokens[0].replace("_", " ");
 
-        // Второй токен - specialValue
         int specialValue;
         try {
             specialValue = Integer.parseInt(tokens[1]);
@@ -60,7 +57,6 @@ class MIO {
             throw new IOException("Ошибка формата specialValue: " + tokens[1]);
         }
 
-        // Третий токен - количество треков
         int trackCount;
         try {
             trackCount = Integer.parseInt(tokens[2]);
@@ -68,13 +64,13 @@ class MIO {
             throw new IOException("Ошибка формата количества треков: " + tokens[2]);
         }
 
-        // Проверяем, что достаточно данных для всех длительностей треков
+        //достаточно данных для всех длительностей треков
         if (tokens.length < 3 + trackCount) {
             throw new IOException("Недостаточно данных для длительностей треков. Ожидалось: " + trackCount +
                     ", найдено: " + (tokens.length - 3));
         }
 
-        // Читаем длительности треков
+        //  длительности треков
         int[] durations = new int[trackCount];
         for (int i = 0; i < trackCount; i++) {
             try {
