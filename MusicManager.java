@@ -1,4 +1,5 @@
 import java.io.*;
+import java.util.ArrayList;
 import java.util.*;
 
 public class MusicManager {
@@ -6,21 +7,27 @@ public class MusicManager {
     private static List<MusicCollection> collections = new ArrayList<>();
 
     public static void main(String[] args) {
-        System.out.println("Лабораторная работа 4. Хархавкина Мария 6301");
+        System.out.println("Лабораторная 5. Хархавкина Мария 6301");
         System.out.println("Music Collection");
 
         boolean x = true;
         while (x) {
+            System.out.println("Лабораторная 3");
             System.out.println("1 - Работа с коллекциями ");
+            System.out.println("Лабораторная 4");
             System.out.println("2 - Байтовые потоки №1");
             System.out.println("3 - Символьные потоки №1");
             System.out.println("4 - Сериализация  №2");
             System.out.println("5 - Форматный ввод/вывод  №3");
+            System.out.println("Лабораторная 5");
+            System.out.println("6 - Classes ThreadWrite, ThreadRead");
+            System.out.println("7 - Runnable");
+            System.out.println("8 - Class WrapperContent");
             System.out.println("0 - Выход");
             int choice = getInt("Ваш выбор: ");
             switch (choice) {
                 case 1:
-                    lR3();
+                    Lr3();
                     break;
                 case 2:
                     workWithByteStreams();
@@ -34,6 +41,15 @@ public class MusicManager {
                 case 5:
                     workWithFormattedIO();
                     break;
+                case 6:
+                    classesThread();
+                    break;
+                case 7:
+                    classesRunnable();
+                    break;
+                case 8:
+                    classesWrapper();
+                    break;
                 case 0:
                     System.out.println("Выход");
                     x = false;
@@ -44,7 +60,114 @@ public class MusicManager {
         }
     }
 
-    private static void lR3() {
+    private static void classesThread(){
+        int[] array = new int[100];
+        MusicCollection content = new Album(array, "Нити", 5);
+
+        // Создаем и запускаем потоки
+        ThreadWrite writer = new ThreadWrite(content);
+        ThreadRead reader = new ThreadRead(content);
+
+        writer.start();
+        reader.start();
+
+        try {
+            writer.join();
+            reader.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("\nОбе нити завершили работу");
+    }
+
+    private static void classesRunnable(){
+        int[] array = new int[100];
+        MusicCollection content = new Playlist(array, "Runnable", 5);
+
+        Semaphore writer = new Semaphore(1); // разрешено
+        Semaphore reader = new Semaphore(0); // запрещено
+
+        // Runnable
+        ThreadWriteRun writeRun = new ThreadWriteRun(content, writer, reader);
+        ThreadReadRun readRun = new ThreadReadRun(content, reader, writer);
+
+        // Потоки
+        Thread writeTh = new Thread(writeRun);
+        Thread readTh = new Thread(readRun);
+
+        writeTh.start();
+        readTh.start();
+
+        try {
+            writeTh.join();
+            readTh.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println("\nОбе нити завершили работу");
+    }
+
+
+    private static void classesWrapper() {
+        MusicCollection originalContent = new Album(new int[]{1, 2, 3}, "Test", 5);
+        MusicCollection syncContent = new WrapperContent(originalContent);
+
+        System.out.println(" ");
+        Thread t1 = new Thread(() -> testMusicCollection(syncContent, "T1"));
+        Thread t2 = new Thread(() -> testMusicCollection(syncContent, "T2"));
+
+        t1.start();
+        t2.start();
+
+        try {
+            t1.join();
+            t2.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Тест завершен");
+    }
+
+
+    private static void testMusicCollection(MusicCollection content, String threadName) {
+        for (int i = 0; i < 5; i++) {
+            try {
+                System.out.println(threadName + " getTitle: " + content.getTitle());
+                content.setTitle("Title " + i);
+                System.out.println(threadName + " getSpecialValue: " + content.getSpecialValue());
+                content.setSpecialValue(i);
+                int[] arr = content.getTrackDurations();
+                content.setTrackDurations(new int[]{i, i + 1, i + 2});
+                System.out.println(threadName + " getTrackElement("+i+"): " + content.getTrackElement(0));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /*
+  private static void classesWrapper() throws InterruptedException {
+      MusicCollection originalContent = new Album(new int[]{1, 2, 3}, "Test", 5);
+      MusicCollection syncContent = new WrapperContent(originalContent);
+      System.out.println(" ");
+      Thread t1 = new Thread(() -> testMusicCollection(syncContent, "T1"));
+      Thread t2 = new Thread(() -> testMusicCollection(syncContent, "T2"));
+
+      t1.start();
+      t2.start();
+
+      try {
+          t1.join();
+          t2.join();
+      }
+      catch (InterruptedException e) {
+          e.printStackTrace();
+      }
+      System.out.println("Тест завершен");
+  }*/
+
+    private static void Lr3() {
         boolean x1 = true;
         while (x1) {
             System.out.println("1 - Добавить коллекцию");
@@ -286,20 +409,20 @@ public class MusicManager {
     private static void charStreamInput() {
         String filename = "music_collections.txt";
         try {
-            System.out.println("Чтение коллекций из символьного потока");
+            System.out.println("Чтение коллекций из символьного потока...");
             FileReader fr = new FileReader(filename);
-
-            collections.clear();
+            List<MusicCollection> readCollections = new ArrayList<>();
 
             MusicCollection mc;
             while ((mc = MIO.readMusicCollection(fr)) != null) {
-                collections.add(mc);
+                readCollections.add(mc);
             }
             fr.close();
 
-            System.out.println("Прочитано " + collections.size() + " коллекций:");
-            for (MusicCollection collection : collections) {
+            System.out.println("Прочитано " + readCollections.size() + " коллекций:");
+            for (MusicCollection collection : readCollections) {
                 System.out.println("  - " + collection);
+                collections.add(collection); // Добавляем в основную коллекцию
             }
         } catch (IOException e) {
             System.out.println("Ошибка чтения: " + e.getMessage());
@@ -339,7 +462,7 @@ public class MusicManager {
 
         String filename = "music_collections.ser";
         try {
-            System.out.println("Сериализация " + collections.size() + " коллекций");
+            System.out.println("Сериализация " + collections.size() + " коллекций...");
             FileOutputStream fos = new FileOutputStream(filename);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             for (MusicCollection mc : collections) {
@@ -366,7 +489,7 @@ public class MusicManager {
                     deserializedCollections.add(mc);
                 }
             } catch (EOFException e) {
-                // конец
+                // Конец файла - нормальная ситуация
             }
             ois.close();
 
@@ -415,7 +538,7 @@ public class MusicManager {
         String filename = "music_collections_formatted.txt";
 
         try {
-            System.out.println("Форматный вывод в файл");
+            System.out.println("Форматный вывод в файл...");
             FileWriter fw = new FileWriter(filename);
             for (MusicCollection mc : collections) {
                 MIO.writeFormatMusicCollection(mc, fw);

@@ -20,7 +20,7 @@ public class Album implements MusicCollection, Serializable {
         }
 
         for (int duration : trackDurations) {
-            if (duration <= 0) {
+            if (duration < 0) {
                 throw new MusicValidationException("Длительность каждого трека должна быть положительной: " + duration);
             }
         }
@@ -29,13 +29,18 @@ public class Album implements MusicCollection, Serializable {
             throw new MusicValidationException("Название альбома не может быть пустым");
         }
 
-        if (introDuration <= 0) {
+        if (introDuration < 0) {
             throw new MusicValidationException("Длительность вступления не может быть отрицательной");
         }
 
         this.trackDurations = trackDurations.clone();
         this.title = title;
         this.introDuration = introDuration;
+    }
+
+    @Override
+    public int length() {
+        return trackDurations.length;
     }
 
     @Override
