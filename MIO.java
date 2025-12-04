@@ -1,14 +1,58 @@
 import java.io.*;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Scanner;
 
-class MIO {
+public class MIO {
 
-    //запись в байтовый поток
+    private static MusicFactory factory = new FactoryAlbum();
+
+    public static void setMusicFactory(MusicFactory v) {
+        if (v == null) {
+            throw new IllegalArgumentException("Ошибка! Нулевое значение!");
+        }
+        factory = v;
+    }
+
+    public static MusicCollection createInstance() {
+        return factory.createInstance();
+    }
+
+    public static MusicCollection createInstance(String title, int[] array, int introDuration) {
+        return factory.createInstance(title, array, introDuration);
+    }
+
+    //6 лр 1
+    public static <T extends Comparable<T>> void sortContent(T[] array) {
+        Arrays.sort(array);
+    }
+
+    //6 лр 2
+    public static <E extends MusicCollection> void sortContent(E[] array, Comparator<? super E> comp) {
+        if (array == null || array.length < 2) {
+            return;
+        }
+        Arrays.sort(array, comp);
+    }
+
+    //6 лр 4
+    public static MusicCollection unmodifiable(MusicCollection c) {
+        if (c == null) {
+            throw new IllegalArgumentException("Ошибка. Null значение.");
+        }
+        return new Decorator(c);
+    }
+
+    public static MusicCollection synchronizedContent(MusicCollection i) {
+        return new WrapperContent(i);
+    }
+
+    // Запись в байтовый поток
     public static void outputMusicCollection(MusicCollection o, OutputStream out) throws IOException {
         o.output(out);
     }
 
-    //чтение из байтового потока
+    // Чтение из байтового потока
     public static MusicCollection inputMusicCollection(InputStream in) throws IOException {
         if (in.available() <= 0) {
             return null;
@@ -21,17 +65,17 @@ class MIO {
         for (int i = 0; i < trackCount; i++) {
             durations[i] = doc.readInt();
         }
-        return new Album(durations, title, specialValue);
+        //return new Album(durations, title, specialValue);
+        return createInstance(title, durations, specialValue);
     }
 
-    //запись в символьный поток
+    // Запись в символьный поток
     public static void writeMusicCollection(MusicCollection o, Writer out) throws IOException {
         o.write(out);
     }
 
-    //чтение из символьного потока
+    // Чтение из символьного потока
     public static MusicCollection readMusicCollection(Reader in) throws IOException {
-        //  все содержимое в строку
         StringBuilder sb = new StringBuilder();
         int ch;
         while ((ch = in.read()) != -1) {
@@ -49,53 +93,36 @@ class MIO {
         }
 
         String title = tokens[0].replace("_", " ");
+        int specialValue = Integer.parseInt(tokens[1]);
+        int trackCount = Integer.parseInt(tokens[2]);
 
-        int specialValue;
-        try {
-            specialValue = Integer.parseInt(tokens[1]);
-        } catch (NumberFormatException e) {
-            throw new IOException("Ошибка формата specialValue: " + tokens[1]);
-        }
-
-        int trackCount;
-        try {
-            trackCount = Integer.parseInt(tokens[2]);
-        } catch (NumberFormatException e) {
-            throw new IOException("Ошибка формата количества треков: " + tokens[2]);
-        }
-
-        //достаточно данных для всех длительностей треков
         if (tokens.length < 3 + trackCount) {
             throw new IOException("Недостаточно данных для длительностей треков. Ожидалось: " + trackCount +
                     ", найдено: " + (tokens.length - 3));
         }
 
-        //  длительности треков
         int[] durations = new int[trackCount];
         for (int i = 0; i < trackCount; i++) {
-            try {
-                durations[i] = Integer.parseInt(tokens[3 + i]);
-            } catch (NumberFormatException e) {
-                throw new IOException("Ошибка формата длительности трека " + (i + 1) + ": " + tokens[3 + i]);
-            }
+            durations[i] = Integer.parseInt(tokens[3 + i]);
         }
-
-        return new Album(durations, title, specialValue);
+        //return new Album(durations, title, specialValue);
+        return createInstance(title, durations, specialValue);
     }
-    //вывод сериализованных объектов
+
+    // Вывод сериализованных объектов
     public static void serializeMusicCollection(MusicCollection o, OutputStream out) throws IOException {
         ObjectOutputStream oos = new ObjectOutputStream(out);
         oos.writeObject(o);
         oos.flush();
     }
 
-    //ввод десериализованного объекта
+    // Ввод десериализованного объекта
     public static MusicCollection deserializeMusicCollection(InputStream in) throws ClassNotFoundException, IOException {
         ObjectInputStream doc = new ObjectInputStream(in);
         return (MusicCollection) doc.readObject();
     }
 
-    //вывод объектов
+    // Вывод объектов
     public static void writeFormatMusicCollection(MusicCollection o, Writer out) throws IOException {
         PrintWriter pw = new PrintWriter(out);
         pw.printf("%s;%d;%d", o.getTitle(), o.getSpecialValue(), o.getTrackDurations().length);
@@ -119,6 +146,7 @@ class MIO {
         for (int i = 0; i < trackCount && (3 + i) < parts.length; i++) {
             durations[i] = Integer.parseInt(parts[3 + i]);
         }
-        return new Album(durations, title, specialValue);
+        //return new Album(durations, title, specialValue);
+        return createInstance(title, durations,specialValue);
     }
 }

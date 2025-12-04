@@ -23,6 +23,12 @@ public class MusicManager {
             System.out.println("6 - Classes ThreadWrite, ThreadRead");
             System.out.println("7 - Runnable");
             System.out.println("8 - Class WrapperContent");
+            System.out.println("Лабораторная 6");
+            System.out.println("9 - Comparable");
+            System.out.println("10 - Comparator");
+            System.out.println("11 - Iterator");
+            System.out.println("12 - Decorator");
+            System.out.println("13 - Factory");
             System.out.println("0 - Выход");
             int choice = getInt("Ваш выбор: ");
             switch (choice) {
@@ -50,6 +56,22 @@ public class MusicManager {
                 case 8:
                     classesWrapper();
                     break;
+                case 9:
+                    Comparable();
+                    break;
+                case 10:
+                    Comparator();
+                    break;
+                case 11:
+                    Iterator();
+                    break;
+                case 12:
+                    Decorator();
+                    break;
+                case 13:
+                    Factory();
+                    break;
+
                 case 0:
                     System.out.println("Выход");
                     x = false;
@@ -59,6 +81,189 @@ public class MusicManager {
             }
         }
     }
+
+    private static void Comparable(){
+        int[] tracks1 = new int[]{180, 200, 150};
+        int[] tracks2 = new int[]{120, 300, 210, 90};
+        int[] tracks3 = new int[]{60, 70, 80, 90};
+        int[] tracks4 = new int[]{200, 100, 150};
+        int[] tracks5 = new int[]{100, 110, 90, 120, 80};
+        int[] tracks6 = new int[]{50, 60, 70};
+
+        MusicCollection album1 = new Album(tracks1, "Album1", 30);
+        MusicCollection album2 = new Album(tracks2, "Album2", 50);
+        MusicCollection album3 = new Album(tracks3, "Album3", 10);
+        MusicCollection album4 = new Album(tracks4, "Album4", 20);
+        MusicCollection album5 = new Album(tracks5, "Album5", 25);
+        MusicCollection album6 = new Album(tracks6, "Album6", 5);
+
+        MusicCollection[] albums = new MusicCollection[]{album1, album2, album3, album4, album5, album6};
+
+        System.out.println("\nИсходный массив Album:");
+        for (MusicCollection album : albums) {
+            System.out.println(album.getTitle() + ": " + Arrays.toString(album.getTrackDurations()) + ", Эфф. длительность: " + album.calculateEffectiveListeningTime() + " сек");
+        }
+
+        Arrays.sort(albums);
+
+        System.out.println("\nСортированный массив Album:");
+        for (MusicCollection album : albums) {
+            System.out.println(album.getTitle() + ": " + Arrays.toString(album.getTrackDurations()) + ", Эфф. длительность: " + album.calculateEffectiveListeningTime() + " сек");
+        }
+    }
+
+    private static void Comparator() {
+        int[] array1 = new int[]{180, 200, 150};
+        MusicCollection c1 = new Album(array1, "Album One", 5);
+
+        int[] array2 = new int[]{210, 120, 130, 140};
+        MusicCollection c2 = new Album(array2, "Album Two", 4);
+        MusicCollection c3 = new Album(array2, "Album Three", 3);
+
+        int[] array4 = new int[]{100, 90, 80, 70, 60};
+        MusicCollection c4 = new Album(array4, "Album Four", 2);
+
+        int[] array5 = new int[]{200, 180, 160, 140, 120};
+        MusicCollection c5 = new Album(array5, "Album Five", 1);
+
+        int[] array6 = new int[]{300, 300, 300};
+        MusicCollection c6 = new Album(array6, "Album Six", 5);
+
+        MusicCollection[] arrMusic = new MusicCollection[]{c1, c2, c3, c4, c5, c6};
+
+        System.out.println("\nИсходный массив типа MusicCollection:");
+        for (MusicCollection mc : arrMusic) {
+            try {
+                System.out.println(mc.getTitle() + ": вступление: " + mc.getSpecialValue() + ", " + Arrays.toString(mc.getTrackDurations()) + " Результат бизнес-метода: " + mc.calculateEffectiveListeningTime());
+            } catch (MusicBusinessException e) {
+                System.out.println(mc.getTitle() + ": ошибка расчета бизнес-метода");
+            }
+        }
+
+        System.out.println("\nМассив, сортированный по убыванию результата бизнес-метода:");
+        MIO.sortContent(arrMusic, new DecreaseBusiness());
+        for (MusicCollection mc : arrMusic) {
+            try {
+                System.out.println(mc.getTitle() + ": вступление: " + mc.getSpecialValue() + ", " + Arrays.toString(mc.getTrackDurations()) + " Результат бизнес-метода: " + mc.calculateEffectiveListeningTime());
+            } catch (MusicBusinessException e) {
+                System.out.println(mc.getTitle() + ": ошибка расчета бизнес-метода");
+            }
+        }
+
+        System.out.println("\nМассив, сортированный по увеличению поля \"Вступление\":");
+        MIO.sortContent(arrMusic, new IncreaseField());
+        for (MusicCollection mc : arrMusic) {
+            try {
+                System.out.println(mc.getTitle() + ": вступление: " + mc.getSpecialValue() + ", " + Arrays.toString(mc.getTrackDurations()) + " Результат бизнес-метода: " + mc.calculateEffectiveListeningTime());
+            } catch (MusicBusinessException e) {
+                System.out.println(mc.getTitle() + ": ошибка расчета бизнес-метода");
+            }
+        }
+    }
+
+    public static void Iterator() {
+        int[] array1 = new int[]{180, 200, 150};
+        MusicCollection c = new Album(array1, "Album1", 10);
+
+        System.out.println("\nFor-each:");
+        for (int duration : c) {
+            System.out.println(duration);
+        }
+
+        System.out.println("\nWhile:");
+        Iterator<Integer> i = c.iterator();
+        while (i.hasNext()) {
+            Integer duration = i.next();
+            System.out.println(duration);
+        }
+    }
+
+    /**
+    public static void Decorator() {
+        MusicCollection originalAlbum = new Album(new int[]{180, 200, 150}, "Original Album", 5);
+        MusicCollection originalPlaylist = new Playlist(new int[]{120, 130, 140}, "Original Playlist", 3);;
+
+        MusicCollection r1 = MIO.unmodifiable(originalAlbum);
+        MusicCollection r2 = MIO.unmodifiable(originalPlaylist);
+
+        System.out.println("\n" + r1.getTitle());
+        System.out.println(r2.getTitle());
+
+        try {
+            // замена setRating на setSpecialValue
+            r1.setSpecialValue(3); // должно выбросить UnsupportedOperationException
+        } catch (UnsupportedOperationException e) {
+            System.out.println("Внимание! \n" + e);
+        }
+    }*/
+
+
+    private static void Decorator() {
+        MusicCollection originalAlbum = new Album(new int[]{180, 200, 150}, "Original Album", 5);
+        MusicCollection originalPlaylist = new Playlist(new int[]{120, 130, 140}, "Original Playlist", 3);
+
+        System.out.println("Оригинал Album: " + originalAlbum);
+        System.out.println("Оригинал Playlist: " + originalPlaylist);
+
+        MusicCollection unmodifiableAlbum = MIO.unmodifiable(originalAlbum);
+        MusicCollection unmodifiablePlaylist = MIO.unmodifiable(originalPlaylist);
+
+        System.out.println("\nUnmodifiable Album: " + unmodifiableAlbum);
+        System.out.println("Unmodifiable Playlist: " + unmodifiablePlaylist);
+
+        System.out.println("\nПопытка изменить title:");
+        try {
+            unmodifiableAlbum.setTitle("New Album Title");
+            System.out.println("Изменение прошло успешно");
+        } catch (UnsupportedOperationException e) {
+            System.out.println("UnsupportedOperationException - правильно!");
+        }
+
+        System.out.println("\nПопытка изменить specialValue:");
+        try {
+            unmodifiableAlbum.setSpecialValue(10);
+            System.out.println("Изменение прошло успешно");
+        } catch (UnsupportedOperationException e) {
+            System.out.println("UnsupportedOperationException - правильно!");
+        }
+
+        System.out.println("\nПопытка изменить треки:");
+        try {
+            unmodifiableAlbum.setTrackDurations(new int[]{1, 2, 3});
+            System.out.println("Изменение прошло успешно");
+        } catch (UnsupportedOperationException e) {
+            System.out.println("UnsupportedOperationException - правильно!");
+        }
+
+        System.out.println("\nПопытка изменить отдельный трек:");
+        try {
+            unmodifiableAlbum.setTrackElement(0, 999);
+            System.out.println("Изменение прошло успешно");
+        } catch (UnsupportedOperationException e) {
+            System.out.println("UnsupportedOperationException - правильно!");
+        }
+
+        System.out.println("\nЧтение данных работает:");
+        System.out.println("Title: " + unmodifiableAlbum.getTitle());
+        System.out.println("SpecialValue (вступление): " + unmodifiableAlbum.getSpecialValue());
+        System.out.println("Track 0: " + unmodifiableAlbum.getTrackElement(0));
+    }
+
+    public static void Factory() {
+        MusicCollection v1 = MIO.createInstance();
+        MusicCollection v2 = MIO.createInstance("Тест Album", new int[]{100, 200, 150}, 5);
+
+        System.out.println("Объект по умолчанию: " + v1.getTitle());
+        System.out.println("Создан с параметрами: " + v2.getTitle());
+
+        MIO.setMusicFactory(new FactoryPlaylist());
+
+        MusicCollection playlist = MIO.createInstance("My Playlist", new int[]{120, 130, 140}, 3);
+        System.out.println("Создан через PlaylistFactory: " + playlist.getTitle() + " (" + playlist.getClass().getSimpleName() + ")");
+    }
+
+
+
 
     private static void classesThread(){
         int[] array = new int[100];
@@ -108,7 +313,6 @@ public class MusicManager {
         System.out.println("\nОбе нити завершили работу");
     }
 
-
     private static void classesWrapper() {
         MusicCollection originalContent = new Album(new int[]{1, 2, 3}, "Test", 5);
         MusicCollection syncContent = new WrapperContent(originalContent);
@@ -129,7 +333,6 @@ public class MusicManager {
         System.out.println("Тест завершен");
     }
 
-
     private static void testMusicCollection(MusicCollection content, String threadName) {
         for (int i = 0; i < 5; i++) {
             try {
@@ -145,27 +348,6 @@ public class MusicManager {
             }
         }
     }
-
-    /*
-  private static void classesWrapper() throws InterruptedException {
-      MusicCollection originalContent = new Album(new int[]{1, 2, 3}, "Test", 5);
-      MusicCollection syncContent = new WrapperContent(originalContent);
-      System.out.println(" ");
-      Thread t1 = new Thread(() -> testMusicCollection(syncContent, "T1"));
-      Thread t2 = new Thread(() -> testMusicCollection(syncContent, "T2"));
-
-      t1.start();
-      t2.start();
-
-      try {
-          t1.join();
-          t2.join();
-      }
-      catch (InterruptedException e) {
-          e.printStackTrace();
-      }
-      System.out.println("Тест завершен");
-  }*/
 
     private static void Lr3() {
         boolean x1 = true;
@@ -290,7 +472,6 @@ public class MusicManager {
             System.out.println("  - " + playlists.get(i).getTitle());
         }
     }
-
 
     private static void workWithByteStreams() {
         boolean inMenu = true;

@@ -1,6 +1,9 @@
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class WrapperContent implements MusicCollection {
     private final MusicCollection wrappedContent;
@@ -97,5 +100,31 @@ public class WrapperContent implements MusicCollection {
 
     public synchronized MusicCollection getWrappedContent() {
         return wrappedContent;
+    }
+
+    //6 лр 1
+    @Override
+    public int compareTo(MusicCollection v2) {
+        if(this.calculateEffectiveListeningTime()>v2.calculateEffectiveListeningTime()){
+            return 1;
+        }
+        else if(this.calculateEffectiveListeningTime()==v2.calculateEffectiveListeningTime()){
+            return 0;
+        }
+        else{return -1;}
+    }
+
+    //6 лр 3
+    public List<Integer> getElements() {
+        List<Integer> list = new ArrayList<>();
+        for (int i : wrappedContent.getTrackDurations()) {
+            list.add(i);
+        }
+        return list;
+    }
+
+    @Override
+    public Iterator<Integer> iterator() {
+        return getElements().iterator(); // базовая реализация на основе списка
     }
 }

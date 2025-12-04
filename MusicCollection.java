@@ -1,9 +1,8 @@
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.Serializable;
 import java.io.Writer;
 
-public interface MusicCollection extends Serializable  {
+public interface MusicCollection extends Comparable<MusicCollection>, Iterable<Integer> {
 
     int[] getTrackDurations();
     void setTrackDurations(int[] durations);

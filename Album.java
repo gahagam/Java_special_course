@@ -1,7 +1,9 @@
 import java.io.*;
 import java.util.Arrays;
+import java.util.Iterator;
 
-public class Album implements MusicCollection, Serializable {
+public class Album implements MusicCollection, Serializable, Comparable<MusicCollection> {
+
     private static final long serialVersionUID = 1L;
 
     private int[] trackDurations;
@@ -101,6 +103,7 @@ public class Album implements MusicCollection, Serializable {
         this.introDuration = value;
     }
 
+
     @Override
     public int calculateEffectiveListeningTime() throws MusicBusinessException {
         int total = 0;
@@ -156,5 +159,51 @@ public class Album implements MusicCollection, Serializable {
         pw.println();
         pw.flush();
     }
+
+
+    //6 лр 1
+    @Override
+    public int compareTo(MusicCollection o) {
+        if (this.calculateEffectiveListeningTime()>o.calculateEffectiveListeningTime()){
+            return 1;
+        }
+        else if (this.calculateEffectiveListeningTime()==o.calculateEffectiveListeningTime()){
+            return 0;
+        }
+        else {
+            return -1;
+        }
+    }
+
+    //6 лр 3
+    @Override
+    public Iterator<Integer> iterator() {
+        return new Iterator<>() {
+            private int index = 0;
+            @Override
+            public boolean hasNext() {
+                return index < trackDurations.length;
+            }
+            @Override
+            public Integer next() {
+                return trackDurations[index++];
+            }
+        };
+    }
+
+    /**
+    @Override
+    public List<Integer> getElements() {
+        List<Integer> list = new ArrayList<>();
+        for (int duration : trackDurations) {
+            list.add(duration);
+        }
+        return list;
+    }
+
+    @Override
+    public Iterator<Integer> iterator() {
+        return getElements().iterator(); // базовая реализация на основе списка
+    }*/
 }
 
